@@ -437,23 +437,46 @@ function rotateMatrix(matrix) {
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
 function sortByAsc(arr) {
-  const sortedArr = arr;
-  let swapped = false;
-  do {
-    swapped = false;
-    for (let i = 0; i < sortedArr.length - 1; i += 1) {
-      if (sortedArr[i] > sortedArr[i + 1]) {
-        const temp = sortedArr[i];
-        sortedArr[i] = sortedArr[i + 1];
-        sortedArr[i + 1] = temp;
-        swapped = true;
+  const a = arr;
+
+  function partition(left, right, pivot) {
+    let leftIndex = left;
+    let rightIndex = right;
+
+    while (leftIndex <= rightIndex) {
+      while (arr[leftIndex] < pivot) {
+        leftIndex += 1;
+      }
+      while (a[rightIndex] > pivot) {
+        rightIndex -= 1;
+      }
+      if (leftIndex <= rightIndex) {
+        const temp = arr[leftIndex];
+        a[leftIndex] = a[rightIndex];
+        a[rightIndex] = temp;
+        leftIndex += 1;
+        rightIndex -= 1;
       }
     }
-  } while (swapped);
+    return leftIndex;
+  }
 
-  return sortedArr;
+  function quickSort(left, right) {
+    if (left >= right) return;
+
+    const pivot = arr[Math.floor((left + right) / 2)];
+    const index = partition(left, right, pivot);
+
+    quickSort(left, index - 1);
+    quickSort(index, right);
+  }
+
+  if (!a || a.length <= 1) {
+    return a;
+  }
+  quickSort(0, a.length - 1);
+  return a;
 }
-
 /**
  * Shuffles characters in a string so that the characters with an odd index are moved to the end of the string at each iteration.
  * Take into account that the string can be very long and the number of iterations is large. Consider how you can optimize your solution.
@@ -505,8 +528,45 @@ function shuffleChar(str, iterations) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  const digits = [];
+  let temp = number;
+
+  while (temp > 0) {
+    digits.unshift(temp % 10);
+    temp = Math.floor(temp / 10);
+  }
+
+  let i = digits.length - 2;
+  while (i >= 0 && digits[i] >= digits[i + 1]) {
+    i -= 1;
+  }
+
+  if (i === -1) {
+    return number;
+  }
+
+  let j = digits.length - 1;
+  while (digits[j] <= digits[i]) {
+    j -= 1;
+  }
+
+  [digits[i], digits[j]] = [digits[j], digits[i]];
+
+  let left = i + 1;
+  let right = digits.length - 1;
+
+  while (left < right) {
+    [digits[left], digits[right]] = [digits[right], digits[left]];
+    left += 1;
+    right -= 1;
+  }
+
+  let result = 0;
+  for (let k = 0; k < digits.length; k += 1) {
+    result = result * 10 + digits[k];
+  }
+  return result;
 }
 
 module.exports = {
